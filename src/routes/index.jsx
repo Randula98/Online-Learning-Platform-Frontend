@@ -6,7 +6,8 @@ import {
 } from "../components";
 
 import {
-    Landing
+    Landing,
+    Course
 } from "../pages";
 
 export default function App() {
@@ -15,7 +16,7 @@ export default function App() {
             <NavBar />
             <Routes>
                 <Route path="/" element={<Landing />} />
-
+                <Route path="/course" element={<Course />} />
             </Routes>
             <Footer />
         </Router>

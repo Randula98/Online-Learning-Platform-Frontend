@@ -1,5 +1,5 @@
 import React from 'react'
-import {Alert, Row, Col } from 'react-bootstrap';
+import { Alert, Row, Col } from 'react-bootstrap';
 
 export default function Announcement() {
 

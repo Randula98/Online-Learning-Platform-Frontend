@@ -1,0 +1,30 @@
+[
+    {
+      "week": "June 1 - June 8",
+      "topic": "Introduction to Programming",
+      "fileurl": "https://example.com/intro_to_programming.pdf",
+      "recordingUrl": "https://example.com/intro_to_programming.pdf"
+    },
+    {
+      "week": "June 9 - June 16",
+      "topic": "Data Structures and Algorithms",
+      "recordingUrl": "https://example.com/intro_to_programming.pdf"
+    },
+    {
+      "week": "June 17 - June 24",
+      "topic": "Web Development Basics",
+      "fileurl": "https://example.com/web_development_basics.pdf"
+    },
+    {
+      "week": "June 25 - July 2",
+      "topic": "Machine Learning Fundamentals",
+      "recordingUrl": "https://example.com/intro_to_programming.pdf"
+    },
+    {
+      "week": "July 3 - July 10",
+      "topic": "Cybersecurity Essentials",
+      "fileurl": "https://example.com/cybersecurity_essentials.pdf",
+      "recordingUrl": "https://example.com/intro_to_programming.pdf"
+    }
+  ]
+  

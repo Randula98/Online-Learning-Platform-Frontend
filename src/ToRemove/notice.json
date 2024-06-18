@@ -1,0 +1,23 @@
+[
+    {
+      "topic": "Technology",
+      "description": "The latest advancements in computing and telecommunications."
+    },
+    {
+      "topic": "Artificial Intelligence",
+      "description": "The development of machines capable of performing tasks that typically require human intelligence."
+    },
+    {
+      "topic": "Space Exploration",
+      "description": "The ongoing efforts to explore outer space, including missions to other planets and celestial bodies."
+    },
+    {
+      "topic": "Climate Change",
+      "description": "The study of long-term changes in temperature, precipitation, and other atmospheric conditions, largely caused by human activities."
+    },
+    {
+      "topic": "Global Economy",
+      "description": "The interconnectedness of economies worldwide and the factors influencing international trade and finance."
+    }
+  ]
+  
