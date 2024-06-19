@@ -34,8 +34,8 @@ export default function NavBar() {
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="me-auto">
                             <Nav.Link href="/courses">Courses</Nav.Link>
-                            <Nav.Link href="/courses">My Courses</Nav.Link>
-                            <Nav.Link href="/courses">Announcements</Nav.Link>
+                            <Nav.Link href="/my-courses">My Courses</Nav.Link>
+                            <Nav.Link href="/announcements">Announcements</Nav.Link>
                         </Nav>
                         <Nav className="ms-auto">
                             <Nav.Item>

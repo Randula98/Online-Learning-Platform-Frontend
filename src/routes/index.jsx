@@ -10,7 +10,9 @@ import {
     Course,
     Courses,
     AdminDashboard,
-    AdminCourse
+    AdminCourse,
+    MyCourses,
+    Announcements
 } from "../pages";
 
 export default function App() {
@@ -23,6 +25,8 @@ export default function App() {
                 <Route path="/courses" element={<Courses />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/course/:id" element={<AdminCourse />} />
+                <Route path="/my-courses" element={<MyCourses />} />
+                <Route path="/announcements" element={<Announcements />} />
             </Routes>
             <Footer />
         </Router>

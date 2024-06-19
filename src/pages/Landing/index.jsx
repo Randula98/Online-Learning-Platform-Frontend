@@ -8,7 +8,7 @@ export default function Landing() {
         <>
             <Slider />
             <br />
-            <Announcement />
+            <Announcement size={4} />
         </>
     )
 }

@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom';
 
 import CourseList from "../../ToRemove/course.json";
 
-export default function Courses() {
+export default function MyCourses() {
 
     const navigate = useNavigate();
 
@@ -48,7 +48,7 @@ export default function Courses() {
     return (
         <Container>
             <Alert variant="light">
-                <h3>Courses</h3>
+                <h3>My Courses</h3>
             </Alert>
 
             <Row className="mb-3">
