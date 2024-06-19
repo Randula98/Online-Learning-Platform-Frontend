@@ -1,0 +1,128 @@
+[
+    {
+        "fname": "John",
+        "lname": "Doe",
+        "email": "john.doe@example.com",
+        "contactNo": "+1234567890"
+    },
+    {
+        "fname": "Jane",
+        "lname": "Smith",
+        "email": "jane.smith@example.com",
+        "contactNo": "+1987654321"
+    },
+    {
+        "fname": "Michael",
+        "lname": "Johnson",
+        "email": "michael.johnson@example.com",
+        "contactNo": "+1122334455"
+    },
+    {
+        "fname": "Emily",
+        "lname": "Davis",
+        "email": "emily.davis@example.com",
+        "contactNo": "+1445566778"
+    },
+    {
+        "fname": "David",
+        "lname": "Brown",
+        "email": "david.brown@example.com",
+        "contactNo": "+1554433221"
+    },
+    {
+        "fname": "Sarah",
+        "lname": "Wilson",
+        "email": "sarah.wilson@example.com",
+        "contactNo": "+1667890123"
+    },
+    {
+        "fname": "Robert",
+        "lname": "Martinez",
+        "email": "robert.martinez@example.com",
+        "contactNo": "+1778901234"
+    },
+    {
+        "fname": "Jennifer",
+        "lname": "Garcia",
+        "email": "jennifer.garcia@example.com",
+        "contactNo": "+1889012345"
+    },
+    {
+        "fname": "William",
+        "lname": "Lopez",
+        "email": "william.lopez@example.com",
+        "contactNo": "+1990123456"
+    },
+    {
+        "fname": "Emma",
+        "lname": "Hernandez",
+        "email": "emma.hernandez@example.com",
+        "contactNo": "+1098765432"
+    },
+    {
+        "fname": "Christopher",
+        "lname": "Young",
+        "email": "christopher.young@example.com",
+        "contactNo": "+1123456789"
+    },
+    {
+        "fname": "Amanda",
+        "lname": "King",
+        "email": "amanda.king@example.com",
+        "contactNo": "+1234567890"
+    },
+    {
+        "fname": "Daniel",
+        "lname": "Scott",
+        "email": "daniel.scott@example.com",
+        "contactNo": "+1345678901"
+    },
+    {
+        "fname": "Olivia",
+        "lname": "Lee",
+        "email": "olivia.lee@example.com",
+        "contactNo": "+1456789012"
+    },
+    {
+        "fname": "Matthew",
+        "lname": "Green",
+        "email": "matthew.green@example.com",
+        "contactNo": "+1567890123"
+    },
+    {
+        "fname": "Sophia",
+        "lname": "Adams",
+        "email": "sophia.adams@example.com",
+        "contactNo": "+1678901234"
+    },
+    {
+        "fname": "James",
+        "lname": "Campbell",
+        "email": "james.campbell@example.com",
+        "contactNo": "+1789012345"
+    },
+    {
+        "fname": "Isabella",
+        "lname": "Mitchell",
+        "email": "isabella.mitchell@example.com",
+        "contactNo": "+1890123456"
+    },
+    {
+        "fname": "Alexander",
+        "lname": "Roberts",
+        "email": "alexander.roberts@example.com",
+        "contactNo": "+1901234567"
+    },
+    {
+        "fname": "Grace",
+        "lname": "Turner",
+        "email": "grace.turner@example.com",
+        "contactNo": "+2012345678"
+    },
+    {
+        "fname": "Benjamin",
+        "lname": "Phillips",
+        "email": "benjamin.phillips@example.com",
+        "contactNo": "+2123456789"
+    }
+]

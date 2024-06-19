@@ -33,9 +33,9 @@ export default function NavBar() {
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="me-auto">
-                            <Nav.Link href="#academic-year">Academic Year</Nav.Link>
-                            <Nav.Link href="#degree">Specializations</Nav.Link>
-                            <Nav.Link href="#degree">Announcements</Nav.Link>
+                            <Nav.Link href="/courses">Courses</Nav.Link>
+                            <Nav.Link href="/courses">My Courses</Nav.Link>
+                            <Nav.Link href="/courses">Announcements</Nav.Link>
                         </Nav>
                         <Nav className="ms-auto">
                             <Nav.Item>
