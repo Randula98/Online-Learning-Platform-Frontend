@@ -9,7 +9,8 @@ import {
     Landing,
     Course,
     Courses,
-    AdminDashboard
+    AdminDashboard,
+    AdminCourse
 } from "../pages";
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
                 <Route path="/course/:id" element={<Course />} />
                 <Route path="/courses" element={<Courses />} />
                 <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/course/:id" element={<AdminCourse />} />
             </Routes>
             <Footer />
         </Router>
