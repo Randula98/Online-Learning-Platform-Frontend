@@ -1,0 +1,94 @@
+import React from 'react'
+import {
+  Button,
+} from 'react-bootstrap';
+import { Formik, Form, Field } from 'formik';
+import * as Yup from 'yup';
+
+
+export default function Register() {
+
+  const registerSchema = Yup.object().shape({
+    fname: Yup.string().required('First name is required'),
+    lname: Yup.string().required('Last name is required'),
+    email: Yup.string().email('Invalid email format').required('Email is required'),
+    contactNo: Yup.string().required('Contact number is required'),
+    password: Yup.string().required('Password is required').min(6, 'Password must be at least 6 characters').max(20, 'Password cannot be more than 20 characters'),
+    confirmPassword: Yup.string()
+      .required('Confirm password is required')
+      .oneOf([Yup.ref('password'), null], 'Passwords must match')
+      .min(6, 'Password must be at least 6 characters')
+      .max(20, 'Password cannot be more than 20 characters')
+  });
+
+
+
+  return (
+    <>
+      <Formik
+        initialValues={{
+          fname: '',
+          lname: '',
+          email: '',
+          contactNo: '',
+          password: '',
+          confirmPassword: ''
+        }}
+        validationSchema={registerSchema}
+        onSubmit={(values) => {
+          // register(values);
+        }}
+      >
+        {({ errors, touched }) => (
+          <Form>
+            <div className="mb-3">
+              <label htmlFor="fname" className="form-label">First Name</label>
+              <Field type="text" className={`form-control ${errors.fname && touched.fname ? 'is-invalid' : ''}`} id="fname" name="fname" />
+              {errors.fname && touched.fname ? (
+                <div className="invalid-feedback">{errors.fname}</div>
+              ) : null}
+            </div>
+            <div className="mb-3">
+              <label htmlFor="lname" className="form-label">Last Name</label>
+              <Field type="text" className={`form-control ${errors.lname && touched.lname ? 'is-invalid' : ''}`} id="lname" name="lname" />
+              {errors.lname && touched.lname ? (
+                <div className="invalid-feedback">{errors.lname}</div>
+              ) : null}
+            </div>
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">Email</label>
+              <Field type="email" className={`form-control ${errors.email && touched.email ? 'is-invalid' : ''}`} id="email" name="email" />
+              {errors.email && touched.email ? (
+                <div className="invalid-feedback">{errors.email}</div>
+              ) : null}
+            </div>
+            <div className="mb-3">
+              <label htmlFor="contactNo" className="form-label">Contact Number</label>
+              <Field type="text" className={`form-control ${errors.contactNo && touched.contactNo ? 'is-invalid' : ''}`} id="contactNo" name="contactNo" />
+              {errors.contactNo && touched.contactNo ? (
+                <div className="invalid-feedback">{errors.contactNo}</div>
+              ) : null}
+            </div>
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">Password</label>
+              <Field type="password" className={`form-control ${errors.password && touched.password ? 'is-invalid' : ''}`} id="password" name="password" />
+              {errors.password && touched.password ? (
+                <div className="invalid-feedback">{errors.password}</div>
+              ) : null}
+            </div>
+            <div className="mb-3">
+              <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
+              <Field type="password" className={`form-control ${errors.confirmPassword && touched.confirmPassword ? 'is-invalid' : ''}`} id="confirmPassword" name="confirmPassword" />
+              {errors.confirmPassword && touched.confirmPassword ? (
+                <div className="invalid-feedback">{errors.confirmPassword}</div>
+              ) : null}
+            </div>
+            <Button variant="primary" type="submit">
+              Register
+            </Button>
+          </Form>
+        )}
+      </Formik>
+    </>
+  )
+}
