@@ -64,7 +64,9 @@ export default function Register() {
             </div>
             <div className="mb-3">
               <label htmlFor="contactNo" className="form-label">Contact Number</label>
-              <Field type="text" className={`form-control ${errors.contactNo && touched.contactNo ? 'is-invalid' : ''}`} id="contactNo" name="contactNo" />
+              <Field type="text" className={`form-control ${errors.contactNo && touched.contactNo ? 'is-invalid' : ''}`} id="contactNo" name="contactNo" onInput={(e) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, "");
+              }} />
               {errors.contactNo && touched.contactNo ? (
                 <div className="invalid-feedback">{errors.contactNo}</div>
               ) : null}

@@ -1,0 +1,142 @@
+[
+    {
+        "courseName": "Introduction to Programming",
+        "moduleCode": "CS101",
+        "academicYear": 1,
+        "academicSemester": 1,
+        "specialization": "Software Engineering"
+    },
+    {
+        "courseName": "Data Structures and Algorithms",
+        "moduleCode": "CS201",
+        "academicYear": 1,
+        "academicSemester": 2,
+        "specialization": "Information Technology"
+    },
+    {
+        "courseName": "Database Systems",
+        "moduleCode": "CS301",
+        "academicYear": 2,
+        "academicSemester": 1,
+        "specialization": "Data Science"
+    },
+    {
+        "courseName": "Operating Systems",
+        "moduleCode": "CS401",
+        "academicYear": 2,
+        "academicSemester": 2,
+        "specialization": "Information System Engineering"
+    },
+    {
+        "courseName": "Software Engineering",
+        "moduleCode": "CS501",
+        "academicYear": 3,
+        "academicSemester": 1,
+        "specialization": "Software Engineering"
+    },
+    {
+        "courseName": "Web Development",
+        "moduleCode": "CS601",
+        "academicYear": 3,
+        "academicSemester": 2,
+        "specialization": "Interactive Media"
+    },
+    {
+        "courseName": "Artificial Intelligence",
+        "moduleCode": "CS701",
+        "academicYear": 4,
+        "academicSemester": 1,
+        "specialization": "Data Science"
+    },
+    {
+        "courseName": "Machine Learning",
+        "moduleCode": "CS801",
+        "academicYear": 4,
+        "academicSemester": 2,
+        "specialization": "Data Science"
+    },
+    {
+        "courseName": "Computer Networks",
+        "moduleCode": "CS901",
+        "academicYear": 1,
+        "academicSemester": 1,
+        "specialization": "Information Technology"
+    },
+    {
+        "courseName": "Cyber Security",
+        "moduleCode": "CS1001",
+        "academicYear": 1,
+        "academicSemester": 2,
+        "specialization": "Cyber Security"
+    },
+    {
+        "courseName": "Mobile App Development",
+        "moduleCode": "CS1101",
+        "academicYear": 2,
+        "academicSemester": 1,
+        "specialization": "Software Engineering"
+    },
+    {
+        "courseName": "Cloud Computing",
+        "moduleCode": "CS1201",
+        "academicYear": 2,
+        "academicSemester": 2,
+        "specialization": "Information Technology"
+    },
+    {
+        "courseName": "Game Development",
+        "moduleCode": "CS1301",
+        "academicYear": 3,
+        "academicSemester": 1,
+        "specialization": "Interactive Media"
+    },
+    {
+        "courseName": "Digital Marketing",
+        "moduleCode": "DM101",
+        "academicYear": 3,
+        "academicSemester": 2,
+        "specialization": "Interactive Media"
+    },
+    {
+        "courseName": "Financial Accounting",
+        "moduleCode": "FA201",
+        "academicYear": 4,
+        "academicSemester": 1,
+        "specialization": "Information System Engineering"
+    },
+    {
+        "courseName": "Business Management",
+        "moduleCode": "BM301",
+        "academicYear": 4,
+        "academicSemester": 2,
+        "specialization": "Information System Engineering"
+    },
+    {
+        "courseName": "Human Resource Management",
+        "moduleCode": "HR401",
+        "academicYear": 1,
+        "academicSemester": 1,
+        "specialization": "Information System Engineering"
+    },
+    {
+        "courseName": "Economics",
+        "moduleCode": "EC501",
+        "academicYear": 2,
+        "academicSemester": 2,
+        "specialization": "Information System Engineering"
+    },
+    {
+        "courseName": "Project Management",
+        "moduleCode": "PM601",
+        "academicYear": 3,
+        "academicSemester": 1,
+        "specialization": "Information Technology"
+    },
+    {
+        "courseName": "Strategic Management",
+        "moduleCode": "SM701",
+        "academicYear": 4,
+        "academicSemester": 2,
+        "specialization": "Information Technology"
+    }
+]

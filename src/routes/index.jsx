@@ -7,7 +7,8 @@ import {
 
 import {
     Landing,
-    Course
+    Course,
+    Courses
 } from "../pages";
 
 export default function App() {
@@ -16,7 +17,8 @@ export default function App() {
             <NavBar />
             <Routes>
                 <Route path="/" element={<Landing />} />
-                <Route path="/course" element={<Course />} />
+                <Route path="/course/:id" element={<Course />} />
+                <Route path="/courses" element={<Courses />} />
             </Routes>
             <Footer />
         </Router>
