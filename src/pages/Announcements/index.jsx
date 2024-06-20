@@ -1,18 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'
 import { Alert, Row, Col, Button } from 'react-bootstrap';
-import AnnouncementList from "../../ToRemove/announcement.json";
+import AnnouncementService from '../../services/Announcement.service';
 
 export default function Announcements() {
     const [currentPage, setCurrentPage] = useState(1);
     const announcementsPerPage = 5;
 
-    function Announcement({ date, topic, description }) {
+    const [AnnouncementList, setAnnouncementList] = useState([]);
+
+    useEffect(() => {
+        AnnouncementService.getAnnouncements()
+            .then(response => {
+                setAnnouncementList(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }, []);
+
+    function Announcement({ timestamp, topic, description }) {
+        const date = new Date(timestamp);
+
+        const year = date.getUTCFullYear();
+        const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+        const day = date.getUTCDate().toString().padStart(2, '0');
+
+        const formattedDate = `${year}-${month}-${day}`;
         return (
             <Alert variant="light">
                 <Row>
                     <Col xs={12} md={2}>
                         <div className="ansDate">
-                            {date}
+                            {formattedDate}
                         </div>
                     </Col>
                     <Col xs={12} md={10}>
@@ -23,7 +42,7 @@ export default function Announcements() {
                     </Col>
                 </Row>
             </Alert>
-        );
+        )
     }
 
     // Calculate the range of announcements to be displayed
@@ -44,7 +63,7 @@ export default function Announcements() {
 
                     <div className="announcementRibbon">
                         {currentAnnouncements.map((announcement, index) => (
-                            <Announcement key={index} date={announcement.date} topic={announcement.topic} description={announcement.description} />
+                            <Announcement key={index} timestamp={announcement.updatedOn} topic={announcement.topic} description={announcement.description} />
                         ))}
                     </div>
 

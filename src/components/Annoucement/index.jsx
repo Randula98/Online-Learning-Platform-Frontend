@@ -1,17 +1,35 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Alert, Row, Col } from 'react-bootstrap';
 
-import AnnouncementList from "../../ToRemove/announcement.json";
+import AnnouncementService from '../../services/Announcement.service';
 
 export default function Announcement({ size }) {
+    const [AnnouncementList, setAnnouncementList] = useState([]);
 
-    function Announcement({ date, topic, description }) {
+    useEffect(() => {
+        AnnouncementService.getAnnouncements()
+            .then(response => {
+                setAnnouncementList(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }, []);
+
+    function Announcement({ timestamp, topic, description }) {
+        const date = new Date(timestamp);
+
+        const year = date.getUTCFullYear();
+        const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+        const day = date.getUTCDate().toString().padStart(2, '0');
+
+        const formattedDate = `${year}-${month}-${day}`;
         return (
             <Alert variant="light">
                 <Row>
                     <Col xs={12} md={2}>
                         <div className="ansDate">
-                            {date}
+                            {formattedDate}
                         </div>
                     </Col>
                     <Col xs={12} md={10}>
@@ -35,10 +53,9 @@ export default function Announcement({ size }) {
 
                     <div className="announcementRibbon">
                         {AnnouncementList.slice(0, size).map((announcement, index) => (
-                            <Announcement key={index} date={announcement.date} topic={announcement.topic} description={announcement.description} />
-                        ))
-                        }
-                        See More ...
+                            <Announcement key={index} timestamp={announcement.updatedOn} topic={announcement.topic} description={announcement.description} />
+                        ))}
+                        <a href="/announcements">See More...</a>
                     </div>
                 </div>
             </div>

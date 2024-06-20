@@ -24,9 +24,12 @@ export default function NavBar() {
     const handleShowRegister = () => setShowRegister(true);
 
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [user, setUser] = useState(null);
 
     useEffect(() => {
         setIsLoggedIn(!!localStorage.getItem('token'));
+        setUser(localStorage.getItem('user'));
+
     }, []);
 
     const handleLogout = () => {
@@ -39,15 +42,36 @@ export default function NavBar() {
         <>
             <Navbar expand="lg" className="bg-body-tertiary">
                 <Container>
-                    <Navbar.Brand href="/">
-                        <img src={cwlogo} alt="Logo" />
-                    </Navbar.Brand>
-                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                    {user === 'admin' ? (
+                        <Navbar.Brand href="/admin">
+                            <img
+                                src={cwlogo}
+                                className="d-inline-block align-top"
+                                alt="Course Work Online Learning"
+                            />
+                        </Navbar.Brand>
+                    ) : (
+                        <Navbar.Brand href="/">
+                            <img
+                                src={cwlogo}
+                                className="d-inline-block align-top"
+                                alt="Course Work Online Learning"
+                            />
+                        </Navbar.Brand>
+                    )}
+                    < Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="me-auto">
-                            <Nav.Link href="/courses">Courses</Nav.Link>
-                            <Nav.Link href="/my-courses">My Courses</Nav.Link>
-                            <Nav.Link href="/announcements">Announcements</Nav.Link>
+                            {user === 'admin' ? (
+                                <Nav.Link href="/admin">Admin Dashboard</Nav.Link>
+                            ) : (
+                                <>
+                                    <Nav.Link href="/courses">Courses</Nav.Link>
+                                    <Nav.Link href="/my-courses">My Courses</Nav.Link>
+                                    <Nav.Link href="/announcements">Announcements</Nav.Link>
+                                </>
+                            )}
+
                         </Nav>
                         <Nav className="ms-auto">
                             {!isLoggedIn && (

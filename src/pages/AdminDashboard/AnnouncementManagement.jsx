@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
     Alert,
     Container,
@@ -10,11 +10,24 @@ import {
 } from "react-bootstrap";
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
+import Swal from 'sweetalert2';
 
-
-import AnnouncementList from "../../ToRemove/announcement.json";
+import AnnouncementService from '../../services/Announcement.service';
 
 export default function AnnouncementManagement() {
+
+    const [AnnouncementList, setAnnouncementList] = useState([]);
+    const [selectedAnnouncement, setSelectedAnnouncement] = useState({});
+
+    useEffect(() => {
+        AnnouncementService.getAnnouncements()
+            .then(response => {
+                setAnnouncementList(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }, []);
 
     const [announcementFilter, setAnnouncementFilter] = useState("");
 
@@ -32,12 +45,19 @@ export default function AnnouncementManagement() {
     const handleShowViewAnnouncement = () => setShowViewAnnouncement(true);
 
     function handleEditAnnouncement(announcement) {
-        //set
+        setSelectedAnnouncement(announcement);
         handleShowEditAnnouncement();
     }
 
     function handleViewAnnouncement(announcement) {
-        //set
+        const date = new Date(announcement.updatedOn);
+
+        const year = date.getUTCFullYear();
+        const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+        const day = date.getUTCDate().toString().padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+        announcement.updatedOn = formattedDate;
+        setSelectedAnnouncement(announcement);
         handleShowViewAnnouncement();
     }
 
@@ -49,6 +69,100 @@ export default function AnnouncementManagement() {
         topic: Yup.string().required('Topic is required'),
         description: Yup.string().required('Description is required'),
     });
+
+    async function addAnnounement(value) {
+        await AnnouncementService.createAnnouncement(value)
+            .then(response => {
+                console.log(response);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Announcement added successfully',
+                    showCloseButton: false,
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(() => {
+                    AnnouncementService.getAnnouncements()
+                        .then(response => {
+                            handleCloseAddAnnouncement();
+                            setAnnouncementList(response.data);
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
+
+                })
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    async function editAnnouncement(value) {
+        await AnnouncementService.updateAnnouncement(selectedAnnouncement._id, value)
+            .then(response => {
+                console.log(response);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Announcement updated successfully',
+                    showCloseButton: false,
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(() => {
+                    AnnouncementService.getAnnouncements()
+                        .then(response => {
+                            handleCloseEditAnnouncement();
+                            setAnnouncementList(response.data);
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
+
+                })
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    async function deleteAnnouncement(id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                AnnouncementService.deleteAnnouncement(id)
+                    .then(response => {
+                        console.log(response);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Deleted',
+                            text: 'Announcement Deleted successfully',
+                            showCloseButton: false,
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => {
+                            AnnouncementService.getAnnouncements()
+                                .then(response => {
+                                    setAnnouncementList(response.data);
+                                })
+                                .catch(error => {
+                                    console.log(error);
+                                });
+                        })
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            }
+        })
+    }
 
     return (
         <>
@@ -82,7 +196,9 @@ export default function AnnouncementManagement() {
                                         <Button variant='success' onClick={() => {
                                             handleEditAnnouncement(announcement);
                                         }}>Edit</Button> &nbsp;
-                                        <Button variant='danger'>Delete</Button>
+                                        <Button variant='danger' onClick={() => {
+                                            deleteAnnouncement(announcement._id);
+                                        }}>Delete</Button>
                                     </Alert>
                                 ))
                             }
@@ -110,7 +226,7 @@ export default function AnnouncementManagement() {
                         }}
                         validationSchema={announcementSchema}
                         onSubmit={(values) => {
-                            // register(values);
+                            addAnnounement(values)
                         }}
                     >
                         {({ errors, touched }) => (
@@ -151,12 +267,12 @@ export default function AnnouncementManagement() {
                 <Modal.Body>
                     <Formik
                         initialValues={{
-                            topic: '',
-                            description: '',
+                            topic: selectedAnnouncement.topic,
+                            description: selectedAnnouncement.description,
                         }}
                         validationSchema={announcementSchema}
                         onSubmit={(values) => {
-                            // register(values);
+                            editAnnouncement(values)
                         }}
                     >
                         {({ errors, touched }) => (
@@ -196,12 +312,13 @@ export default function AnnouncementManagement() {
                 </Modal.Header>
                 <Modal.Body>
                     <div className="mb-3">
-                        <label htmlFor="topic" className="form-label">Topic</label> - <span>Topic</span>
+                        <label htmlFor="topic" className="form-label"><h3>{selectedAnnouncement.topic}</h3></label>
 
                     </div>
                     <div className="mb-3">
-                        <label htmlFor="description" className="form-label">Description</label>
-                        <p>Description</p>
+                        <label htmlFor="description" className="form-label">{selectedAnnouncement.description}</label>
+                        <br />
+                        <label htmlFor="description" className="form-label">{selectedAnnouncement.updatedOn}</label>
                     </div>
                 </Modal.Body>
             </Modal>
