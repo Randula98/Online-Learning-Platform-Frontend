@@ -90,7 +90,6 @@ export default function AnnouncementManagement() {
                         .catch(error => {
                             console.log(error);
                         });
-
                 })
             })
             .catch(error => {

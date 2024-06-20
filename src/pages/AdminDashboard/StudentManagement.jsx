@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
     Alert,
     Container,
@@ -10,10 +10,24 @@ import {
 } from "react-bootstrap";
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
+import Swal from 'sweetalert2';
 
-import StudentList from "../../ToRemove/student.json";
+import StudentService from '../../services/Student.service';
 
 export default function StudentManagement() {
+
+    const [StudentList, setStudentList] = useState([]);
+    const [selectedStudent, setSelectedStudent] = useState({});
+
+    useEffect(() => {
+        StudentService.getStudents()
+            .then(response => {
+                setStudentList(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }, []);
 
     const [studentFilter, setStudentFilter] = useState("");
 
@@ -31,12 +45,12 @@ export default function StudentManagement() {
     const handleShowViewStudent = () => setShowViewStudent(true);
 
     function handleEditStudent(student) {
-        //set
+        setSelectedStudent(student);
         handleShowEditStudent();
     }
 
     function handleViewStudent(student) {
-        //set
+        setSelectedStudent(student);
         handleShowViewStudent();
     }
 
@@ -51,7 +65,7 @@ export default function StudentManagement() {
         fname: Yup.string().required('First name is required'),
         lname: Yup.string().required('Last name is required'),
         email: Yup.string().email('Invalid email format').required('Email is required'),
-        contactNo: Yup.string().required('Contact number is required'),
+        contactNo: Yup.string().required('Contact number is required').min(10, 'Contact number must be at least 10 digits').max(10, 'Contact number cannot be more than 10 digits'),
         password: Yup.string().required('Password is required').min(6, 'Password must be at least 6 characters').max(20, 'Password cannot be more than 20 characters'),
         confirmPassword: Yup.string()
             .required('Confirm password is required')
@@ -59,6 +73,112 @@ export default function StudentManagement() {
             .min(6, 'Password must be at least 6 characters')
             .max(20, 'Password cannot be more than 20 characters')
     });
+
+    const editStudentSchema = Yup.object().shape({
+        fname: Yup.string().required('First name is required'),
+        lname: Yup.string().required('Last name is required'),
+        email: Yup.string().email('Invalid email format').required('Email is required'),
+        contactNo: Yup.string().required('Contact number is required').min(10, 'Contact number must be at least 10 digits').max(10, 'Contact number cannot be more than 10 digits'),
+    });
+
+
+    async function addStudent(values) {
+        try {
+            await StudentService.createStudent(values);
+            handleCloseAddStudent();
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Student added successfully',
+                showCloseButton: false,
+                showConfirmButton: false,
+                timer: 2000
+            }).then(() => {
+                StudentService.getStudents()
+                    .then(response => {
+                        setStudentList(response.data);
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            });
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Failed to add student'
+            });
+        }
+    }
+
+    async function editStudent(values) {
+        console.log(values);
+        try {
+            await StudentService.updateStudent(selectedStudent._id, values);
+            handleCloseEditStudent();
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Student updated successfully',
+                showCloseButton: false,
+                showConfirmButton: false,
+                timer: 2000
+            }).then(() => {
+                StudentService.getStudents()
+                    .then(response => {
+                        setStudentList(response.data);
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            });
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Failed to update student'
+            });
+        }
+    }
+
+    async function deleteStudent(id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will not be able to recover this student!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, keep it'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await StudentService.deleteStudent(id);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Student deleted successfully',
+                        showCloseButton: false,
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(() => {
+                        StudentService.getStudents()
+                            .then(response => {
+                                setStudentList(response.data);
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            });
+                    });
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Failed to delete student'
+                    });
+                }
+            }
+        });
+    }
 
     return (
         <>
@@ -97,7 +217,9 @@ export default function StudentManagement() {
                                                 <Button variant='success' onClick={() => {
                                                     handleEditStudent(student);
                                                 }}>Edit</Button> &nbsp; &nbsp;
-                                                <Button variant='danger'>Delete</Button>
+                                                <Button variant='danger' onClick={() => {
+                                                    deleteStudent(student._id);
+                                                }}>Delete</Button>
 
                                             </Col>
                                         </Row>
@@ -132,7 +254,7 @@ export default function StudentManagement() {
                         }}
                         validationSchema={studentSchema}
                         onSubmit={(values) => {
-                            // register(values);
+                            addStudent(values);
                         }}
                     >
                         {({ errors, touched }) => (
@@ -201,16 +323,15 @@ export default function StudentManagement() {
                 <Modal.Body>
                     <Formik
                         initialValues={{
-                            fname: '',
-                            lname: '',
-                            email: '',
-                            contactNo: '',
-                            password: '',
-                            confirmPassword: ''
+                            fname: selectedStudent.fname,
+                            lname: selectedStudent.lname,
+                            email: selectedStudent.email,
+                            contactNo: selectedStudent.contactNo,
                         }}
-                        validationSchema={studentSchema}
+                        validationSchema={editStudentSchema}
                         onSubmit={(values) => {
-                            // register(values);
+                            console.log(values);
+                            editStudent(values)
                         }}
                     >
                         {({ errors, touched }) => (
@@ -266,15 +387,13 @@ export default function StudentManagement() {
                 <Modal.Body>
                     <Formik
                         initialValues={{
-                            fname: '',
-                            lname: '',
-                            email: '',
-                            contactNo: '',
-                            password: '',
-                            confirmPassword: ''
+                            fname: selectedStudent.fname,
+                            lname: selectedStudent.lname,
+                            email: selectedStudent.email,
+                            contactNo: selectedStudent.contactNo,
                         }}
                         validationSchema={studentSchema}
-                        onSubmit={(values) => {
+                        onSubmit={() => {
                             // register(values);
                         }}
                     >
@@ -282,21 +401,21 @@ export default function StudentManagement() {
                             <Form>
                                 <div className="mb-3">
                                     <label htmlFor="fname" className="form-label">First Name</label>
-                                    <Field type="text" className={`form-control ${errors.fname && touched.fname ? 'is-invalid' : ''}`} id="fname" name="fname" />
+                                    <Field type="text" className={`form-control ${errors.fname && touched.fname ? 'is-invalid' : ''}`} id="fname" name="fname" readOnly />
                                     {errors.fname && touched.fname ? (
                                         <div className="invalid-feedback">{errors.fname}</div>
                                     ) : null}
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="lname" className="form-label">Last Name</label>
-                                    <Field type="text" className={`form-control ${errors.lname && touched.lname ? 'is-invalid' : ''}`} id="lname" name="lname" />
+                                    <Field type="text" className={`form-control ${errors.lname && touched.lname ? 'is-invalid' : ''}`} id="lname" name="lname" readOnly />
                                     {errors.lname && touched.lname ? (
                                         <div className="invalid-feedback">{errors.lname}</div>
                                     ) : null}
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="email" className="form-label">Email</label>
-                                    <Field type="email" className={`form-control ${errors.email && touched.email ? 'is-invalid' : ''}`} id="email" name="email" />
+                                    <Field type="email" className={`form-control ${errors.email && touched.email ? 'is-invalid' : ''}`} id="email" name="email" readOnly />
                                     {errors.email && touched.email ? (
                                         <div className="invalid-feedback">{errors.email}</div>
                                     ) : null}
@@ -305,7 +424,7 @@ export default function StudentManagement() {
                                     <label htmlFor="contactNo" className="form-label">Contact Number</label>
                                     <Field type="text" className={`form-control ${errors.contactNo && touched.contactNo ? 'is-invalid' : ''}`} id="contactNo" name="contactNo" onInput={(e) => {
                                         e.target.value = e.target.value.replace(/[^0-9]/g, "");
-                                    }} />
+                                    }} readOnly />
                                     {errors.contactNo && touched.contactNo ? (
                                         <div className="invalid-feedback">{errors.contactNo}</div>
                                     ) : null}
