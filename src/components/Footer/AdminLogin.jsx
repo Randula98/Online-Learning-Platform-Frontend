@@ -4,30 +4,66 @@ import {
 } from 'react-bootstrap';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
+import Swal from 'sweetalert2';
+
+import AdminService from '../../services/Admin.service';
 
 export default function AdminLogin() {
 
   const loginSchema = Yup.object().shape({
     email: Yup.string()
-        .email('Invalid email format')
-        .required('Email is required'),
+      .email('Invalid email format')
+      .required('Email is required'),
     password: Yup.string()
-        .required('Password is required')
-        .min(6, 'Password must be at least 6 characters')
-        .max(20, 'Password cannot be more than 20 characters')
-});
+      .required('Password is required')
+      .min(6, 'Password must be at least 6 characters')
+      .max(20, 'Password cannot be more than 20 characters')
+  });
+
+  async function login(values) {
+    try {
+      const response = await AdminService.login(values);
+      if (!response.data.password) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Invalid email or password!',
+          footer: 'Please try again',
+          showCloseButton: false,
+          showConfirmButton: false,
+          timer: 2000
+        });
+      }
+      else {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Login successful!',
+          showCloseButton: false,
+          showConfirmButton: false,
+          timer: 2000
+        }).then(() => {
+          localStorage.setItem('token', response.data.token);
+          localStorage.setItem('user', response.data.type);
+          window.location.href = '/admin';
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
 
   return (
     <div>
       <Formik
         initialValues={{
-          email: '',
-          password: ''
+          email: 'randulam@gmail.com',
+          password: '123456'
         }}
         validationSchema={loginSchema}
         onSubmit={(values) => {
-          // login(values);
+          login(values);
         }}
       >
         {({ errors, touched }) => (

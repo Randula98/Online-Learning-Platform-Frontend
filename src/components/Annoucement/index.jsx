@@ -42,7 +42,6 @@ export default function Announcement({ size }) {
                     </div>
                 </div>
             </div>
-
         </>
     )
 }

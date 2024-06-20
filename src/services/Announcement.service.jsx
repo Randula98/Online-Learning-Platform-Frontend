@@ -48,7 +48,7 @@ const deleteAnnouncement = async (id) => {
     });
 }
 
-export {
+export default {
     getAnnouncements,
     getAnnouncementById,
     createAnnouncement,

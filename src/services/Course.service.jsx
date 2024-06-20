@@ -48,7 +48,7 @@ const deleteCourse = async (id) => {
     });
 }
 
-export {
+export default {
     getCourses,
     getCourseById,
     createCourse,

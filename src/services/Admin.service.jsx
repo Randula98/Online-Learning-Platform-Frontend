@@ -48,7 +48,7 @@ const deleteAdmin = async (id) => {
     });
 }
 
-const loginAdmin = async (data) => {
+const login = async (data) => {
     return await axios.post(URL.ADMIN_LOGIN, data, {
         headers: {
             "Content-Type": "application/json",
@@ -56,11 +56,11 @@ const loginAdmin = async (data) => {
     });
 }
 
-export {
+export default {
     getAllAdmins,
     getAdminById,
     createAdmin,
     updateAdmin,
     deleteAdmin,
-    loginAdmin,
+    login,
 }

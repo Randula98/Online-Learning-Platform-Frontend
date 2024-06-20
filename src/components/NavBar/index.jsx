@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Container,
     Navbar,
@@ -23,6 +23,18 @@ export default function NavBar() {
     const handleCloseRegister = () => setShowRegister(false);
     const handleShowRegister = () => setShowRegister(true);
 
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        setIsLoggedIn(!!localStorage.getItem('token'));
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/';
+    };
+
     return (
         <>
             <Navbar expand="lg" className="bg-body-tertiary">
@@ -38,17 +50,28 @@ export default function NavBar() {
                             <Nav.Link href="/announcements">Announcements</Nav.Link>
                         </Nav>
                         <Nav className="ms-auto">
-                            <Nav.Item>
-                                <Button variant="outline-dark" onClick={handleShowRegister}>
-                                    Register
-                                </Button>
-                            </Nav.Item>
-                            &nbsp;&nbsp;
-                            <Nav.Item>
-                                <Button variant="outline-dark" onClick={handleShowLogin}>
-                                    Login
-                                </Button>
-                            </Nav.Item>
+                            {!isLoggedIn && (
+                                <>
+                                    <Nav.Item>
+                                        <Button variant="outline-dark" onClick={handleShowRegister}>
+                                            Register
+                                        </Button>
+                                    </Nav.Item>
+                                    &nbsp;&nbsp;
+                                    <Nav.Item>
+                                        <Button variant="outline-dark" onClick={handleShowLogin}>
+                                            Login
+                                        </Button>
+                                    </Nav.Item>
+                                </>
+                            )}
+                            {isLoggedIn && (
+                                <Nav.Item>
+                                    <Button variant="outline-dark" onClick={handleLogout}>
+                                        Logout
+                                    </Button>
+                                </Nav.Item>
+                            )}
                         </Nav>
                     </Navbar.Collapse>
                 </Container>

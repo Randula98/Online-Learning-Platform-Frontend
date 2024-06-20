@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Button, Modal } from 'react-bootstrap';
 
 import AdminLogin from './AdminLogin';
@@ -10,13 +10,36 @@ export default function Footer() {
   const handleCloseLogin = () => setShowLogin(false);
   const handleShowLogin = () => setShowLogin(true);
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setIsLoggedIn(!!localStorage.getItem('token'));
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/';
+  };
+
+
   return (
+
     <>
       <footer className="bg-light text-dark py-3 mt-4">
         <Container>
           <hr className="mt-2 mb-3" />
           <p className="text-center">&copy; {new Date().getFullYear()} Course Work Online Learning (E-Learning) Platoform
-            <Button variant="link" onClick={handleShowLogin}>Admin Login</Button>
+            {isLoggedIn && (
+              <Button variant="outline-dark" onClick={handleLogout} className="float-end">
+                Logout
+              </Button>
+            )}
+            {!isLoggedIn && (
+              <Button variant="outline-dark" onClick={handleShowLogin} className="float-end">
+                Admin Login
+              </Button>
+            )}
           </p>
         </Container>
       </footer>

@@ -56,7 +56,7 @@ const login = async (data) => {
     });
 }
 
-export {
+export default {
     getStudents,
     getStudentById,
     createStudent,

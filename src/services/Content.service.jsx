@@ -57,7 +57,7 @@ const getContentByCourseId = async (id) => {
     });
 }
 
-export {
+export default {
     getContents,
     getContentById,
     createContent,

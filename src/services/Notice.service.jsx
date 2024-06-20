@@ -57,7 +57,7 @@ const getNoticeByCourseId = async (id) => {
     });
 }
 
-export {
+export default {
     getNotices,
     getNoticeById,
     createNotice,
