@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
     Alert,
     Container,
@@ -11,12 +11,24 @@ import {
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
-
-import CourseList from "../../ToRemove/course.json";
+import Swal from 'sweetalert2';
+import CourseService from '../../services/Course.service';
 
 export default function CourseManagement() {
 
+    const [CourseList, setCourseList] = useState([]);
+
     const navigate = useNavigate();
+
+    useEffect(() => {
+        CourseService.getCourses()
+            .then(response => {
+                setCourseList(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }, []);
 
     const [courseFilter, setCourseFilter] = useState("");
     const [currentCourse, setCurrentCourse] = useState(null);
@@ -46,9 +58,96 @@ export default function CourseManagement() {
         moduleCode: Yup.string().required('Module Code is required'),
         academicYear: Yup.string().required('Academic Year is required'),
         academicSemester: Yup.string().required('Academic Semester is required'),
+        specialization: Yup.string().required('Specialization is required'),
         courseYear: Yup.string().required('Course Year is required'),
         courseMonth: Yup.string().required('Course Month is required'),
     });
+
+    async function addCourse(values) {
+        try {
+            await CourseService.createCourse(values);
+            Swal.fire({
+                icon: 'success',
+                title: 'Course Added Successfully',
+                showCloseButton: false,
+                showConfirmButton: false,
+                timer: 2000
+            }).then(() => {
+                CourseService.getCourses()
+                    .then(response => {
+                        setCourseList(response.data);
+                        handleCloseAddCourse();
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            });
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+
+    async function editCourse(values) {
+        try {
+            await CourseService.updateCourse(currentCourse._id, values);
+            Swal.fire({
+                icon: 'success',
+                title: 'Course Updated Successfully',
+                showCloseButton: false,
+                showConfirmButton: false,
+                timer: 2000
+            }).then(() => {
+                CourseService.getCourses()
+                    .then(response => {
+                        setCourseList(response.data);
+                        handleCloseEditCourse();
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            });
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+
+    async function deleteCourse(courseId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to delete this course?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await CourseService.deleteCourse(courseId);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Course Deleted Successfully',
+                        showCloseButton: false,
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(() => {
+                        CourseService.getCourses()
+                            .then(response => {
+                                setCourseList(response.data);
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            });
+                    });
+                }
+                catch (error) {
+                    console.log(error);
+                }
+            }
+        });
+    }
 
     return (
         <>
@@ -82,10 +181,12 @@ export default function CourseManagement() {
                                             </Col>
                                             <Col xs={2} className="d-flex align-items-end justify-content-end">
                                                 <Button variant='info' onClick={() => {
-                                                    navigate(`/admin/course/${course.id}`)
+                                                    navigate(`/admin/course/${course._id}`)
                                                 }}>View</Button>&nbsp; &nbsp;
                                                 <Button variant='success' onClick={() => handleEditCourse(course)}>Edit</Button> &nbsp; &nbsp;
-                                                <Button variant='danger'>Delete</Button>
+                                                <Button variant='danger' onClick={() => {
+                                                    deleteCourse(course._id);
+                                                }}>Delete</Button>
                                             </Col>
                                         </Row>
                                     </Alert>
@@ -115,12 +216,14 @@ export default function CourseManagement() {
                             moduleCode: '',
                             academicYear: '',
                             academicSemester: '',
+                            specialization: '',
                             courseYear: '',
                             courseMonth: '',
                         }}
                         validationSchema={courseSchema}
                         onSubmit={(values) => {
-                            // register(values);
+                            console.log(values);
+                            addCourse(values);
                         }}
                     >
                         {({ errors, touched }) => (
@@ -168,6 +271,21 @@ export default function CourseManagement() {
                                     </Field>
                                     {errors.academicSemester && touched.academicSemester ? (
                                         <div className="invalid-feedback">{errors.academicSemester}</div>
+                                    ) : null}
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="specialization" className="form-label">Specialization</label>
+                                    <Field as="select" className={`form-control ${errors.specialization && touched.specialization ? 'is-invalid' : ''}`} id="specialization" name="specialization">
+                                        <option value="">Select Specialization...</option>
+                                        <option value="Software Engineering">Software Engineering</option>
+                                        <option value="Information Technology">Information Technology</option>
+                                        <option value="Data Science">Data Science</option>
+                                        <option value="Information System Engineering">Information System Engineering</option>
+                                        <option value="Cyber Security">Cyber Security</option>
+                                        <option value="Interactive Media">Interactive Media</option>
+                                    </Field>
+                                    {errors.specialization && touched.specialization ? (
+                                        <div className="invalid-feedback">{errors.specialization}</div>
                                     ) : null}
                                 </div>
                                 <div className="mb-3">
@@ -211,13 +329,14 @@ export default function CourseManagement() {
                             moduleCode: '',
                             academicYear: '',
                             academicSemester: '',
+                            specialization: '',
                             courseYear: '',
                             courseMonth: '',
                         }}
                         enableReinitialize={true}
                         validationSchema={courseSchema}
                         onSubmit={(values) => {
-                            // register(values);
+                            editCourse(values);
                         }}
                     >
                         {({ errors, touched }) => (
@@ -265,6 +384,21 @@ export default function CourseManagement() {
                                     </Field>
                                     {errors.academicSemester && touched.academicSemester ? (
                                         <div className="invalid-feedback">{errors.academicSemester}</div>
+                                    ) : null}
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="specialization" className="form-label">Specialization</label>
+                                    <Field as="select" className={`form-control ${errors.specialization && touched.specialization ? 'is-invalid' : ''}`} id="specialization" name="specialization">
+                                        <option value="">Select Specialization...</option>
+                                        <option value="Software Engineering">Software Engineering</option>
+                                        <option value="Information Technology">Information Technology</option>
+                                        <option value="Data Science">Data Science</option>
+                                        <option value="Information System Engineering">Information System Engineering</option>
+                                        <option value="Cyber Security">Cyber Security</option>
+                                        <option value="Interactive Media">Interactive Media</option>
+                                    </Field>
+                                    {errors.specialization && touched.specialization ? (
+                                        <div className="invalid-feedback">{errors.specialization}</div>
                                     ) : null}
                                 </div>
                                 <div className="mb-3">
