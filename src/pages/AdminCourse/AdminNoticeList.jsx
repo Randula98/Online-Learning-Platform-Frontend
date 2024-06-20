@@ -2,8 +2,13 @@ import React, { useState } from 'react';
 import { Alert, Button, Row, Col, Modal } from 'react-bootstrap'
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
+import Swal from 'sweetalert2';
 
-export default function AdminNoticeList({ notices }) {
+import NoticeService from '../../services/Notice.service';
+
+export default function AdminNoticeList({ notices, courseId }) {
+
+  const [seletedNotice, setSelectedNotice] = useState({});
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -15,7 +20,7 @@ export default function AdminNoticeList({ notices }) {
   const handleShowEditModal = () => setShowEditModal(true);
 
   function handleEditModal(notice) {
-    //set
+    setSelectedNotice(notice);
     handleShowEditModal();
   }
 
@@ -23,6 +28,80 @@ export default function AdminNoticeList({ notices }) {
     topic: Yup.string().required('Topic is required'),
     description: Yup.string().required('Description is required'),
   });
+
+  async function addNotice(values) {
+    values.course = courseId;
+    try {
+      const response = await NoticeService.createNotice(values);
+      if (response.status === 200) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Notice added successfully',
+          showCloseButton: false,
+          showConfirmButton: false,
+          timer: 2000
+        });
+        handleCloseAddModal();
+        // getCourseData();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function editNotice(values) {
+    values.course = courseId;
+    try {
+      const response = await NoticeService.updateNotice(seletedNotice._id, values);
+      if (response.status === 200) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Notice updated successfully',
+          showCloseButton: false,
+          showConfirmButton: false,
+          timer: 2000
+        });
+        handleCloseEditModal();
+        // getCourseData();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function deleteNotice(id) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will not be able to recover this notice!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, keep it'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await NoticeService.deleteNotice(id);
+          if (response.status === 200) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success',
+              text: 'Notice deleted successfully',
+              showCloseButton: false,
+              showConfirmButton: false,
+              timer: 2000
+            }).then(() => {
+              // getCourseData();
+            });
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    }
+    )
+  }
 
   return (
     <>
@@ -35,26 +114,31 @@ export default function AdminNoticeList({ notices }) {
         </Col>
       </Row>
       <ul className="mt-2">
-        {notices.map((notice, index) => (
-          <Alert variant="secondary" key={index}>
-            <Row>
-              <Col md={8}>
-                <Alert.Heading>{notice.topic}</Alert.Heading>
-              </Col>
-              <Col md={4}>
-                <Button variant="success" onClick={() => {
-                  handleEditModal(notice)
-                }}>Edit</Button>&nbsp;&nbsp;
-                <Button variant="danger">Delete</Button>
-              </Col>
-            </Row>
+        {notices && (
+          notices.map((notice, index) => (
+            <Alert variant="secondary" key={index}>
+              <Row>
+                <Col md={8}>
+                  <Alert.Heading>{notice.topic}</Alert.Heading>
+                </Col>
+                <Col md={4}>
+                  <Button variant="success" onClick={() => {
+                    handleEditModal(notice)
+                  }}>Edit</Button>&nbsp;&nbsp;
+                  <Button variant="danger" onClick={() => {
+                    deleteNotice(notice._id)
+                  }}>Delete</Button>
+                </Col>
+              </Row>
 
-            <hr />
-            <p className="mb-0">
-              {notice.description}
-            </p>
-          </Alert>
-        ))}
+              <hr />
+              <p className="mb-0">
+                {notice.description}
+              </p>
+            </Alert>
+          ))
+        )}
+
       </ul>
 
       {/* Add Notice Modal */}
@@ -75,7 +159,7 @@ export default function AdminNoticeList({ notices }) {
             }}
             validationSchema={noticeSchema}
             onSubmit={(values) => {
-              // register(values);
+              addNotice(values);
             }}
           >
             {({ errors, touched }) => (
@@ -114,12 +198,12 @@ export default function AdminNoticeList({ notices }) {
         <Modal.Body>
           <Formik
             initialValues={{
-              topic: '',
-              description: '',
+              topic: seletedNotice.topic,
+              description: seletedNotice.description,
             }}
             validationSchema={noticeSchema}
             onSubmit={(values) => {
-              // register(values);
+              editNotice(values);
             }}
           >
             {({ errors, touched }) => (

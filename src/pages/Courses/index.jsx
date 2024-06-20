@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
     Alert,
     Container,
@@ -13,12 +13,33 @@ import {
     Pagination
 } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
-import CourseList from "../../ToRemove/course.json";
+import CourseService from '../../services/Course.service';
 
 export default function Courses() {
 
+    const [CourseList, setCourseList] = useState([]);
+
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        setIsLoggedIn(!!localStorage.getItem('token'));
+        setUser(localStorage.getItem('user'));
+    }, []);
+
     const navigate = useNavigate();
+
+    useEffect(() => {
+        CourseService.getCourses()
+            .then(response => {
+                setCourseList(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }, []);
 
     const [currentPage, setCurrentPage] = useState(1);
     const [searchQuery, setSearchQuery] = useState("");
@@ -120,7 +141,19 @@ export default function Courses() {
                                     <p>{course.specialization}</p>
                                     <p>Year {course.academicYear} - Semester {course.academicSemester}</p>
                                     <Button variant="primary" onClick={() => {
-                                        navigate(`/course/${course.moduleCode}`);
+                                        if (isLoggedIn) {
+                                            navigate(`/courses/${course._id}`);
+                                        }
+                                        else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Oops...',
+                                                text: 'You need to login to view course details!',
+                                                showCloseButton: false,
+                                                showConfirmButton: false,
+                                                timer: 2000
+                                            });
+                                        }
 
                                     }}>View Course</Button>
                                 </Alert>

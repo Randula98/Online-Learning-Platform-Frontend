@@ -29,7 +29,6 @@ export default function NavBar() {
     useEffect(() => {
         setIsLoggedIn(!!localStorage.getItem('token'));
         setUser(localStorage.getItem('user'));
-
     }, []);
 
     const handleLogout = () => {
@@ -67,7 +66,14 @@ export default function NavBar() {
                             ) : (
                                 <>
                                     <Nav.Link href="/courses">Courses</Nav.Link>
-                                    <Nav.Link href="/my-courses">My Courses</Nav.Link>
+                                    <Nav.Link onClick={() => {
+                                        if (isLoggedIn) {
+                                            window.location.href = '/my-courses';
+                                        }
+                                        else {
+                                            handleShowLogin();
+                                        }
+                                    }}>My Courses</Nav.Link>
                                     <Nav.Link href="/announcements">Announcements</Nav.Link>
                                 </>
                             )}

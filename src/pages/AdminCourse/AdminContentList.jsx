@@ -2,8 +2,17 @@ import React, { useState } from 'react';
 import { Alert, Button, Row, Col, Modal } from 'react-bootstrap'
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
+import Swal from 'sweetalert2';
+import { storage } from '../../../firebase';
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { v4 } from "uuid";
 
-export default function AdminContentList({ contents }) {
+import ContentService from '../../services/Content.service';
+
+export default function AdminContentList({ contents, courseId }) {
+
+    const [seletedContent, setSelectedContent] = useState({});
+    const [file, setFile] = useState('')
 
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
@@ -24,16 +33,119 @@ export default function AdminContentList({ contents }) {
     }
 
     function handleViewModel(content) {
-        //set
+        setSelectedContent(content);
         handleShowViewModal();
     }
 
     const contentSchema = Yup.object().shape({
         week: Yup.string().required('Week is required'),
         topic: Yup.string().required('Topic is required'),
-        fileUrl: Yup.string().required('File URL is required'),
-        recordingUrl: Yup.string().required('Recording URL is required'),
     });
+
+    async function addContent(values) {
+        // upload file to firebase
+        const storageRef = ref(storage, `contents/${file.name + v4()}`);
+
+        await uploadBytes(storageRef, file)
+            .then((snapshot) => {
+                console.log('Uploaded a blob or file!');
+            })
+            .catch((error) => {
+                console.error('Error uploading file', error);
+            });
+
+        values.course = courseId;
+
+        await getDownloadURL(storageRef)
+            .then(async (url) => {
+                values.fileUrl = url;
+                try {
+                    const response = await ContentService.createContent(values);
+                    if (response.status === 200) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'Content added successfully',
+                            showCloseButton: false,
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                        handleCloseAddModal();
+                        // getCourseData();
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            });
+    }
+
+    async function editContent(values) {
+        // upload file to firebase
+        const storageRef = ref(storage, `contents/${file.name + v4()}`);
+
+        await uploadBytes(storageRef, file)
+            .then((snapshot) => {
+                console.log('Uploaded a blob or file!');
+            })
+            .catch((error) => {
+                console.error('Error uploading file', error);
+            });
+
+        values.course = courseId;
+
+        await getDownloadURL(storageRef)
+            .then(async (url) => {
+                values.fileUrl = url;
+                try {
+                    const response = await ContentService.updateContent(values);
+                    if (response.status === 200) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'Content updated successfully',
+                            showCloseButton: false,
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                        handleCloseEditModal();
+                        // getCourseData();
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            });
+    }
+
+    async function deleteContent(id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will not be able to recover this content!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, keep it'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await ContentService.deleteContent(id);
+                    if (response.status === 200) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'Content deleted successfully',
+                            showCloseButton: false,
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                        // getCourseData();
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        })
+    }
+
 
     return (
 
@@ -47,21 +159,26 @@ export default function AdminContentList({ contents }) {
                 </Col>
             </Row>
             <ul className="mt-2">
-                {contents.map((content, index) => (
-                    <Alert variant="light" key={index}>
-                        <Alert.Heading>{content.week} - {content.topic}</Alert.Heading>
-                        <hr />
-                        <p className="mb-0">
-                            <Button variant="primary" onClick={() => (
-                                handleViewModel(content)
-                            )}>View</Button>&nbsp;&nbsp;
-                            <Button variant="success" onClick={() => {
-                                handleEditModal(content)
-                            }}>Edit</Button>&nbsp;&nbsp;
-                            <Button variant="danger">Delete</Button>
-                        </p>
-                    </Alert>
-                ))}
+                {contents && (
+                    contents.map((content, index) => (
+                        <Alert variant="light" key={index}>
+                            <Alert.Heading>{content.week} - {content.topic}</Alert.Heading>
+                            <hr />
+                            <p className="mb-0">
+                                <Button variant="primary" onClick={() => (
+                                    handleViewModel(content)
+                                )}>View</Button>&nbsp;&nbsp;
+                                <Button variant="success" onClick={() => {
+                                    handleEditModal(content)
+                                }}>Edit</Button>&nbsp;&nbsp;
+                                <Button variant="danger" onClick={() => {
+                                    deleteContent(content._id)
+                                }}>Delete</Button>
+                            </p>
+                        </Alert>
+                    ))
+                )}
+
             </ul>
 
             {/* Add Content Modal */}
@@ -79,12 +196,11 @@ export default function AdminContentList({ contents }) {
                         initialValues={{
                             week: '',
                             topic: '',
-                            fileUrl: '',
                             recordingUrl: ''
                         }}
                         validationSchema={contentSchema}
                         onSubmit={(values) => {
-                            // addContent(values);
+                            addContent(values);
                         }}
                     >
                         {({ errors, touched }) => (
@@ -105,7 +221,9 @@ export default function AdminContentList({ contents }) {
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="fileUrl" className="form-label">File URL</label>
-                                    <Field type="text" className={`form-control ${errors.fileUrl && touched.fileUrl ? 'is-invalid' : ''}`} id="fileUrl" name="fileUrl" />
+                                    <input type="file" className={`form-control ${errors.fileUrl && touched.fileUrl ? 'is-invalid' : ''}`} id="fileUrl" name="fileUrl" onChange={(e) => {
+                                        setFile(e.target.files[0]);
+                                    }} />
                                     {errors.fileUrl && touched.fileUrl ? (
                                         <div className="invalid-feedback">{errors.fileUrl}</div>
                                     ) : null}
@@ -165,7 +283,9 @@ export default function AdminContentList({ contents }) {
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="fileUrl" className="form-label">File URL</label>
-                                    <Field type="text" className={`form-control ${errors.fileUrl && touched.fileUrl ? 'is-invalid' : ''}`} id="fileUrl" name="fileUrl" />
+                                    <input type="file" className={`form-control ${errors.fileUrl && touched.fileUrl ? 'is-invalid' : ''}`} id="fileUrl" name="fileUrl" onChange={(e) => {
+                                        setFile(e.target.files[0]);
+                                    }} />
                                     {errors.fileUrl && touched.fileUrl ? (
                                         <div className="invalid-feedback">{errors.fileUrl}</div>
                                     ) : null}
@@ -195,10 +315,10 @@ export default function AdminContentList({ contents }) {
                     <Modal.Title>View Content</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <p>Week: 1</p>
-                    <p>Topic: Introduction to Programming</p>
-                    <p>File URL: <a href="#">Click here</a></p>
-                    <p>Recording URL: <a href="#">Click here</a></p>
+                    <p>Week: {seletedContent.week}</p>
+                    <p>Topic: {seletedContent.topic}</p>
+                    <p>File URL: <a href={seletedContent.fileUrl} target='_blank'>Click here</a></p>
+                    <p>Recording URL: <a href={seletedContent.recordingUrl} target='_blank'>Click here</a></p>
                 </Modal.Body>
             </Modal>
         </>
