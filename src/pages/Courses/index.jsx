@@ -14,19 +14,33 @@ import {
 } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { jwtDecode } from 'jwt-decode';
 
 import CourseService from '../../services/Course.service';
+import StudentService from '../../services/Student.service';
 
 export default function Courses() {
+
+    const id = jwtDecode(localStorage.getItem('token')).id;
+
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        StudentService.getStudentById(id)
+            .then(response => {
+                setUser(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }, [id]);
 
     const [CourseList, setCourseList] = useState([]);
 
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [user, setUser] = useState(null);
 
     useEffect(() => {
         setIsLoggedIn(!!localStorage.getItem('token'));
-        setUser(localStorage.getItem('user'));
     }, []);
 
     const navigate = useNavigate();
@@ -65,6 +79,38 @@ export default function Courses() {
     const totalPages = Math.ceil(filteredCourses.length / coursesPerPage);
 
     const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+
+    async function handleEnroll(courseId) {
+        //check if user is already enrolled
+        const isEnrolled = user.enrolledCourses.some(course => course._id === courseId);
+
+        if (isEnrolled) {
+            navigate(`/course/${courseId}`);
+        }
+        else {
+            Swal.fire({
+                title: 'Do you wish to enroll in this course?',
+                showDenyButton: true,
+                confirmButtonText: `Yes`,
+                denyButtonText: `No`,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    StudentService.enroll({
+                        studentId: user._id,
+                        courseId: courseId
+                    })
+                        .then(response => {
+                            Swal.fire('Enrolled!', '', 'success');
+                            navigate(`/course/${courseId}`);
+                        })
+                        .catch(error => {
+                            Swal.fire('Oops...', 'Something went wrong!', 'error');
+                            console.log(error);
+                        });
+                }
+            });
+        }
+    }
 
     return (
         <Container>
@@ -142,7 +188,7 @@ export default function Courses() {
                                     <p>Year {course.academicYear} - Semester {course.academicSemester}</p>
                                     <Button variant="primary" onClick={() => {
                                         if (isLoggedIn) {
-                                            navigate(`/courses/${course._id}`);
+                                            handleEnroll(course._id);
                                         }
                                         else {
                                             Swal.fire({

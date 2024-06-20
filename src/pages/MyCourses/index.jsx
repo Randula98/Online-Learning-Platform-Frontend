@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
     Alert,
     Container,
@@ -13,10 +13,28 @@ import {
     Pagination
 } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
-import CourseList from "../../ToRemove/course.json";
+import StudentService from '../../services/Student.service';
 
 export default function MyCourses() {
+
+    const id = jwtDecode(localStorage.getItem('token')).id;
+
+    const [user, setUser] = useState(null);
+    const [enrolledCourses, setEnrolledCourses] = useState([]);
+
+    useEffect(() => {
+        StudentService.getStudentById(id)
+            .then(response => {
+                setUser(response.data);
+                console.log(response.data);
+                setEnrolledCourses(response.data.enrolledCourses);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }, [id]);
 
     const navigate = useNavigate();
 
@@ -27,7 +45,7 @@ export default function MyCourses() {
     const [selectedSpecialization, setSelectedSpecialization] = useState(null);
     const coursesPerPage = 6;
 
-    const filteredCourses = CourseList.filter(course => {
+    const filteredCourses = enrolledCourses.filter(course => {
         const matchesSearchQuery = course.courseName.toLowerCase().includes(searchQuery.toLowerCase()) ||
             course.moduleCode.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesYear = selectedYear ? course.academicYear === selectedYear : true;
@@ -112,7 +130,7 @@ export default function MyCourses() {
 
             <Container>
                 <Row>
-                    {
+                    {currentCourses && (
                         currentCourses.map((course, index) => (
                             <Col key={index} xs={12} md={6} lg={4} className="mb-3">
                                 <Alert variant="light">
@@ -120,13 +138,13 @@ export default function MyCourses() {
                                     <p>{course.specialization}</p>
                                     <p>Year {course.academicYear} - Semester {course.academicSemester}</p>
                                     <Button variant="primary" onClick={() => {
-                                        navigate(`/course/${course.moduleCode}`);
-
+                                        navigate(`/course/${course._id}`);
                                     }}>View Course</Button>
                                 </Alert>
                             </Col>
                         ))
-                    }
+                    )}
+
                 </Row>
                 <Pagination>
                     <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />

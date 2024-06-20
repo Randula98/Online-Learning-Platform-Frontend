@@ -56,6 +56,25 @@ const login = async (data) => {
     });
 }
 
+const enroll = async (data) => {
+    return await axios.post(URL.STUDENT_ENROLL, data, {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+    });
+}
+
+const unenroll = async (data) => {
+    console.log(data);
+    return await axios.post(URL.STUDENT_UNENROLL, data, {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+    });
+}
+
 export default {
     getStudents,
     getStudentById,
@@ -63,4 +82,6 @@ export default {
     updateStudent,
     deleteStudent,
     login,
+    enroll,
+    unenroll,
 }
