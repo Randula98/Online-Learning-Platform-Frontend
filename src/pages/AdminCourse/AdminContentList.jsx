@@ -196,7 +196,6 @@ export default function AdminContentList({ contents, courseId }) {
                         initialValues={{
                             week: '',
                             topic: '',
-                            recordingUrl: ''
                         }}
                         validationSchema={contentSchema}
                         onSubmit={(values) => {
@@ -255,9 +254,8 @@ export default function AdminContentList({ contents, courseId }) {
                 <Modal.Body>
                     <Formik
                         initialValues={{
-                            week: '',
-                            topic: '',
-                            fileUrl: '',
+                            week: seletedContent.week,
+                            topic: seletedContent.topic,
                             recordingUrl: ''
                         }}
                         validationSchema={contentSchema}

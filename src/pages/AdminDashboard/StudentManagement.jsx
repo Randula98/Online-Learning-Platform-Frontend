@@ -6,13 +6,15 @@ import {
     Col,
     Form as FormBST,
     Button,
-    Modal
+    Modal,
+    Table
 } from "react-bootstrap";
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import Swal from 'sweetalert2';
 
 import StudentService from '../../services/Student.service';
+import CourseService from '../../services/Course.service';
 
 export default function StudentManagement() {
 
@@ -175,6 +177,52 @@ export default function StudentManagement() {
                         title: 'Error!',
                         text: 'Failed to delete student'
                     });
+                }
+            }
+        });
+    }
+
+    async function unenrollStudent(courseId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will not be able to recover this student!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, keep it'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const data = {
+                    courseId: courseId,
+                    studentId: selectedStudent._id
+                }
+                console.log(data);
+                try {
+                    await StudentService.unenroll(data);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Student unenrolled successfully',
+                        showCloseButton: false,
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(() => {
+                        StudentService.getStudents()
+                            .then(response => {
+                                setStudentList(response.data);
+
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            });
+                    });
+                } catch (error) {
+                    console.log(error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Failed to unenroll student'
+                    })
                 }
             }
         });
@@ -432,6 +480,48 @@ export default function StudentManagement() {
                             </Form>
                         )}
                     </Formik>
+
+                    <hr />
+
+                    <h3>Enrolled Courses</h3>
+                    <Table striped bordered hover>
+                        <thead>
+                            <tr>
+                                <th>Course Name</th>
+                                <th>Module Code</th>
+                                <th>View</th>
+                                <th>Unenroll</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                <>
+                                    {
+                                        selectedStudent.enrolledCourses && (
+                                            selectedStudent.enrolledCourses.map((course, index) => (
+                                                <>
+                                                    <tr>
+                                                        <td key={index}>{course.courseName}</td>
+                                                        <td key={index}>{course.moduleCode}</td>
+                                                        <td><Button variant='primary'
+                                                            onClick={() => {
+                                                                window.location.href = `/course/${course._id}`;
+                                                            }}
+                                                        >View</Button></td>
+                                                        <td><Button variant='danger' onClick={() => {
+                                                            unenrollStudent(course._id);
+                                                        }}>Unenroll</Button></td>
+                                                    </tr>
+                                                </>
+                                            ))
+                                        )
+                                    }
+
+                                </>
+                            }
+                        </tbody>
+                    </Table>
+
                 </Modal.Body>
             </Modal>
         </>
